@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>meme me!</title>
+  </head>
+
+  <body class="container grid">
+    <header>
+      <h1 class="impact">meme me!</h1>
+    </header>
+
+    <main>
+      <article>
+        <canvas
+          id="meme"
+          name="meme"
+          aria-label="Meme image"
+          alt="Empty meme placeholder"
+        >
+        </canvas>
+      </article>
+    </main>
+
+    <nav>
+      <div id="steps" class="container">
+        <div class="step" id="take-photo">
+          <button role="button">Take photo</button>
+          <dialog name="photo" aria-label="Take photo">
+            <form method="dialog">
+              <article>
+                <header>
+                  Take photo
+                  <button
+                    class="close contrast"
+                    type="button"
+                    aria-label="Done"
+                  ></button>
+                </header>
+                <main>
+                  <button id="start-webcam" type="button">Start webcam</button>
+                  <input id="photo-complete" type="hidden" value="no" />
+                </main>
+              </article>
+            </form>
+          </dialog>
+        </div>
+
+        <div class="step" id="add-text">
+          <button role="button">Add text</button>
+          <dialog name="text" aria-label="Add text">
+            <form method="dialog">
+              <article>
+                <header>
+                  Add text
+                  <button
+                    class="close contrast"
+                    type="submit"
+                    aria-label="Done"
+                  ></button>
+                </header>
+                <main>
+                  <button>+</button>
+                  <input id="text-complete" type="hidden" value="no" />
+                </main>
+              </article>
+            </form>
+          </dialog>
+        </div>
+
+        <div class="step" id="share">
+          <button role="button">Share</button>
+          <dialog name="share" aria-label="Share">
+            <form method="dialog">
+              <article>
+                <header>
+                  Share
+                  <button
+                    class="close contrast"
+                    type="submit"
+                    aria-label="Done"
+                  ></button>
+                </header>
+                <main>
+                  <input
+                    type="email"
+                    value=""
+                    placeholder="your@email.com"
+                    required
+                    autofocus
+                  />
+                  <button type="button">share</button>
+                  <input id="share-complete" type="hidden" value="no" />
+                </main>
+              </article>
+            </form>
+          </dialog>
+        </div>
+      </div>
+    </nav>
+
+    <footer>
+      <a href="https://frontendmasters.com/" target="_blank"
+        >ProJS on FrontendMasters</a
+      >
+      <label>
+        <input
+          type="checkbox"
+          id="switch"
+          name="switch"
+          role="switch"
+          checked
+        />
+        Dark mode
+      </label>
+    </footer>
+  </body>
+
+  <script id="main.js">
+    const steps = document.querySelectorAll("#steps > *");
+    for (let [number, step] of steps.entries()) {
+      const openButton = step.querySelector("button");
+      const dialog = step.querySelector("dialog");
+      const form = step.querySelector("form");
+      const closeButton = form.querySelector("button.close");
+      const nextStep = steps.item(number + 1);
+
+      if (number > 0) {
+        openButton.setAttribute("disabled", "true");
+      }
+
+      function checkCompleted() {
+        const nextStepButton = nextStep?.querySelector("button");
+        const isCompleted = form.querySelector("input[type=hidden]");
+        if (isCompleted?.value === "yes") {
+          step.classList.add("complete");
+          openButton.classList.add("secondary");
+          nextStepButton?.removeAttribute("disabled");
+          return true;
+        } else {
+          step.classList.remove("complete");
+          openButton.classList.remove("secondary");
+          nextStepButton?.setAttribute("disabled", "true");
+          return false;
+        }
+      }
+
+      openButton.addEventListener("click", () => {
+        dialog.showModal();
+      });
+
+      const checkAndClose = (e) => {
+        checkCompleted();
+        dialog.close();
+      };
+
+      form.addEventListener("submit", checkAndClose);
+      closeButton.addEventListener("click", checkAndClose);
+
+      for (let input of form.elements) {
+        input.addEventListener("input", () => {
+          if (checkCompleted()) dialog.close();
+        });
+      }
+    }
+  </script>
+  <script id="webcam.js">
+    const takeBtn = document.createElement("button");
+    takeBtn.type = "button";
+    takeBtn.textContent = "Take photo";
+
+    const retakeBtn = document.createElement("button");
+    retakeBtn.type = "button";
+    retakeBtn.textContent = "Retake photo";
+    retakeBtn.classList.add("contrast");
+
+    const acceptBtn = document.createElement("button");
+    acceptBtn.type = "submit";
+    acceptBtn.textContent = "Use this photo";
+    acceptBtn.setAttribute("disabled", "true");
+
+    const webcamButton = document.getElementById("start-webcam");
+    webcamButton.addEventListener("click", async (e) => {
+      let webcam = null;
+      try {
+        webcam = await getVideoSource();
+      } catch (error) {
+        webcamButton.textContent = "Failed to access webcam";
+      }
+
+      webcam?.addEventListener("canplay", () => {
+        const { videoWidth, videoHeight } = webcam;
+
+        const meme = document.getElementById("meme");
+        memeCtx = meme.getContext("2d");
+        meme.setAttribute("width", videoWidth);
+        meme.setAttribute("height", videoHeight);
+
+        const preview = document.createElement("canvas");
+        const previewCtx = preview.getContext("2d");
+        preview.setAttribute("width", videoWidth);
+        preview.setAttribute("height", videoHeight);
+
+        takeBtn.addEventListener("click", () => {
+          previewCtx.drawImage(webcam, 0, 0, videoWidth, videoHeight);
+          webcam.pause();
+          webcam.replaceWith(preview);
+          takeBtn.replaceWith(retakeBtn);
+          acceptBtn.removeAttribute("disabled");
+        });
+
+        retakeBtn.addEventListener("click", () => {
+          webcam.play();
+          preview.replaceWith(webcam);
+          retakeBtn.replaceWith(takeBtn);
+          acceptBtn.setAttribute("disabled", "true");
+        });
+
+        acceptBtn.addEventListener("click", (e) => {
+          const incomplete = document.getElementById("photo-complete");
+          incomplete.value = "yes";
+          memeCtx.drawImage(webcam, 0, 0, videoWidth, videoHeight);
+        });
+
+        const acceptOrRetake = document.createElement("fieldset");
+        acceptOrRetake.appendChild(takeBtn);
+        acceptOrRetake.appendChild(acceptBtn);
+
+        webcamButton.replaceWith(webcam, acceptOrRetake);
+      });
+    });
+
+    // startButton.addEventListener('click', () => {
+    //     runPhotobooth(webcam, webcam.videoWidth);
+    // })
+    // startButton.removeAttribute('disabled');
+  </script>
+</html>

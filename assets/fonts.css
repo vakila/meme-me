@@ -1,0 +1,16 @@
+.impact {
+  font-family: Impact, sans-serif;
+}
+
+.arial {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.comic-sans {
+  font-family: "Comic Sans MS", sans-serif;
+}
+
+h1 {
+  font-size: 3em;
+  text-transform: uppercase;
+}

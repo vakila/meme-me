@@ -1,0 +1,58 @@
+#steps {
+  height: 100%;
+  display: flex;
+  margin-left: 0px;
+  margin-right: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: left;
+}
+
+#steps > * {
+  width: 100%;
+  margin: 0px auto;
+}
+
+.modal-content {
+  padding-top: 0.5em;
+  padding-bottom: 1em;
+}
+
+.modal-content > * {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+dialog form,
+dialog article {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+dialog form {
+  text-align: left;
+  min-width: 50%;
+  max-width: 100%;
+}
+
+dialog article {
+  min-height: fit-content;
+  max-height: 100vh;
+  padding-top: 1em;
+  padding-bottom: 0.5em;
+}
+
+dialog h2 {
+  margin-bottom: 0.5em;
+}
+
+dialog article main {
+  display: flex;
+  gap: 0.5em;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}

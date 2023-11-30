@@ -1,0 +1,90 @@
+body.grid {
+  width: 100%;
+  min-height: 480px;
+  overflow-y: scroll;
+  margin: 0px auto;
+  text-align: center;
+  grid-template-areas:
+    "header"
+    "main"
+    "nav"
+    "footer";
+  grid-template-columns: 1fr;
+  grid-template-rows: max-content 2fr 1fr max-content;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --header-height: 3em;
+    --footer-height: 2em;
+  }
+
+  body.grid {
+    height: 100vh;
+    grid-template-areas:
+      "header main"
+      "nav main"
+      "footer main";
+    grid-template-columns: minmax(20%, 40%) 1fr;
+    grid-template-rows: min-content 1fr min-content;
+  }
+
+  body > header {
+    text-align: left;
+    padding-bottom: 0px;
+  }
+
+  body > main {
+    margin-top: var(--header-height);
+    margin-bottom: var(--footer-height);
+  }
+
+  body > footer {
+    padding-top: 0px;
+  }
+}
+
+body > header {
+  grid-area: header;
+}
+
+header > h1 {
+  margin-bottom: 0px;
+}
+
+body > nav {
+  grid-area: nav;
+  flex-direction: column;
+}
+
+body > main {
+  grid-area: main;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  align-self: center;
+  justify-self: center;
+  min-height: 480px;
+}
+
+body > footer {
+  grid-area: footer;
+  width: 100%;
+}
+
+footer > * {
+  margin-bottom: 0px;
+}
+
+#settings,
+#dark-mode {
+  flex-shrink: 0;
+  text-align: left;
+}
+
+main > video,
+main > canvas,
+#meme {
+  object-fit: contain;
+  width: 100%;
+  height: 90%;
+}
